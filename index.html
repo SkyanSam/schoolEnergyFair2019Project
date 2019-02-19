@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html>
+ <head>
+    
+<title>INCLUDING Processing.JS IN WEBPAGES</title> 
+
+</head>
+<body>
+<p align="center"> 
+     
+<canvas id="mycanvas"></canvas> 
+    
+</p>
+ </body>
+<script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+
+<script>
+  
+var sketchProc = function(processingInstance) {
+     
+with (processingInstance) {
+        
+size(400, 400); 
+        
+frameRate(30);
+        
+        
+// WRITE YOUR PROGRAM CODE HERE  
+
+// Defines & Creates a square
+var quadDefine = function() {
+    this.speed = [0,0];
+    this.size = 0;
+    this.pos = [0,0]; // Position
+    this.friction = 1;
+    this.gravity = 1;
+};
+
+// Updates the square to simulate physics.    
+var quad_update = function(quad) {
+    fill(0, 0, 0);
+    rect(quad.pos[0],quad.pos[1],quad.size,quad.size);
+    
+    if (Math.abs(quad.speed[0]) > 0) { 
+        quad.speed[0] *= quad.friction;
+    }
+    
+    quad.pos[0] += quad.speed[0];
+    return quad;
+};
+
+// Checks for a collision
+var quad_collision_check = function(q1, q2) {
+    var x = q1.pos[0];
+    var y = q1.pos[1];
+    var x2 = q2.pos[0];
+    var y2 = q2.pos[1];
+    var width = q2.size;
+    var height = q2.size;
+    return ((x > x2) &&
+    (x < x2 + width)
+    );
+};
+
+// Allows the physics to change based on the type
+var quad_collision = function(q1,q2) {
+    var nq = [q1,q2];
+    nq[0].speed[0] += q2.speed[0];
+    nq[1].speed[0] += q1.speed[0];
+    return nq;
+};
+
+// Checks for a collision and if so updates physics to match that collision
+var quad_collision_create = function (q1,q2) {
+    if (quad_collision_check(q1,q2)) {
+        return quad_collision(q1,q2);
+    } else {
+        var quads = [q1, q2];
+        return quads;
+    }
+};
+
+
+
+
+// We define our variables here
+
+// First Square
+var Square1 = new quadDefine();
+Square1.speed[0] = -1;
+Square1.size = 20;
+Square1.pos = [400, Square1.size + 160];
+Square1.friction = 1;
+
+// Second Square
+var Square2 = new quadDefine();
+Square2.speed[0] = 1;
+Square2.size = 20;
+Square2.pos = [0,Square2.size + 160];
+Square2.friction = 1;
+
+
+// Repeating loop that runs every frame
+var draw = function() {
+    
+    // Draws the background and the floor
+    background(255, 255, 255);
+    line(0,200,400,200);
+    
+    // Updates the squares using our physics
+    fill(0, 0, 0);
+    Square1 = quad_update(Square1);
+    Square2 = quad_update(Square2);
+    
+    // Changes momentum if theres a collision 
+    var quad = quad_collision_create(Square1, Square2);
+    Square1 = quad[0];
+    Square2 = quad[1];
+    
+    // Prints position & speed variables
+    println("Square1 Position: " + Square1.pos + " Square2 Position: " + Square2.pos);
+    println("Square1 Speed: " + Square1.speed + " Square2 Speed: " + Square2.speed);
+};
+
+
+
+//YOUR JS PROGRAM CODE ENDS HERE.
+}};  
+// Get the canvas that Processing-js will use
+    
+var canvas = document.getElementById("mycanvas"); 
+  
+  // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    
+var processingInstance = new Processing(canvas, sketchProc); 
+
+ </script>
+
+
+</html>
